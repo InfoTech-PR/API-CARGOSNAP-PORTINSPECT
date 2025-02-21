@@ -1,10 +1,8 @@
 import { Router } from "express";
-import cors from "cors";
-import * as cargosnapController from "../controllers/cargosnapController";
+import cargosnapRoutes from "./cargosnapRoutes";
 
 const router = Router();
 
-router.get("/arquivos", cargosnapController.getArquivos);
-router.post("/novo-recurso", cargosnapController.createRecurso);
+router.use("/cargosnap", cargosnapRoutes);
 
 export default router;
