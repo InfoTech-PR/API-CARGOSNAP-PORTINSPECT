@@ -19,7 +19,6 @@ export const cargosnapRequest = async (endpoint: string, method: "GET" | "POST",
     });
     return response.data;
   } catch (error: any) {
-    console.error("Erro na requisição:", error.response?.data || error.message);
     throw new Error(error.response?.data?.message || "Erro na API do Cargosnap");
   }
 };
