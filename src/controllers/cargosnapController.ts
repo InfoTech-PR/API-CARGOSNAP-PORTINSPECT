@@ -51,8 +51,18 @@ export const closeFilesById = async (req: Request, res: Response) => {
   }
 }
 
-//DELETE
-export const deleteFilesById = async (req: Request, res: Response) => {}
+export const deleteFilesById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: "O ID do arquivo é obrigatório." });
+
+    const data = await cargosnapRequest(`/files/${id}`, "DELETE");
+    res.json(data);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 //POST
 export const uploadsFiles = async (req: Request, res: Response) => {}
 //POST
