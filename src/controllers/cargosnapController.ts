@@ -63,8 +63,23 @@ export const deleteFilesById = async (req: Request, res: Response) => {
   }
 }
 
-//POST
-export const uploadsFiles = async (req: Request, res: Response) => {}
+export const uploadsFiles = async (req: Request, res: Response) => {
+  try {
+    const { reference, uploads, include_in_share, location } = req.body;
+    if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
+
+    const data = await cargosnapRequest(`/files`, "POST", {
+      reference,
+      uploads,
+      include_in_share,
+      location,      
+    });
+    res.json(data);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 //POST
 export const fieldsFiles = async (req: Request, res: Response) => {}
 //POST
