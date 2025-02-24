@@ -111,7 +111,24 @@ export const reportsFiles = async (req: Request, res: Response) => {
   }
 }
 
-//GET
-export const shareFiles = async (req: Request, res: Response) => {}
-//GET
+export const shareFiles = async (req: Request, res: Response) => {
+  try {
+    const { reference, expires, language, dl, email, send_email } = req.body;
+    if (!reference) return res.status(400).json({ error: "O campo reference é obrigatório!"});
+
+    const data = await cargosnapRequest(`/share`, "GET", {
+      reference,
+      expires ,
+      language,
+      dl,
+      email,
+      send_email
+    });
+    res.json(data);
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export const formsFilesById = async (req: Request, res: Response) => {}
