@@ -21,10 +21,36 @@ export const getFilesById = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 }
-//POST
-export const setFiles = async (req: Request, res: Response) => {}
-//PATCH
-export const closeFilesById = async (req: Request, res: Response) => {}
+
+export const setFiles = async (req: Request, res: Response) => {
+  try {
+    const { reference, close, location } = req.body;
+    if (!reference) return res.status(400).json({ error: "O campo refencia é obrigatório!"});
+
+    const data = await cargosnapRequest(`/files`, "POST", {
+      reference,
+      close: close ?? false,
+      location,
+    });
+    res.json(data);
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const closeFilesById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
+
+    const data = await cargosnapRequest(`/files/${id}/close`, "PATCH");
+    res.json(data);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message })
+  }
+}
+
 //DELETE
 export const deleteFilesById = async (req: Request, res: Response) => {}
 //POST
