@@ -14,7 +14,20 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 app.use(express.json());
 
-app.get("/ping", (req: Request, res: Response) => res.json({ pong: true }));
+app.get("/status", (req: Request, res: Response) => {
+  const uptimeInSeconds = process.uptime();
+  const hours = Math.floor(uptimeInSeconds / 3600);
+  const minutes = Math.floor((uptimeInSeconds % 3600) / 60);
+  const seconds = Math.floor(uptimeInSeconds % 60);
+
+  res.json({ 
+    status: "API rodando",
+    uptime: `${hours}h ${minutes}m ${seconds}s`,
+    timestamp: new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }),
+    developed: "Josue Henrique",
+    portfolio: "https://josuashenrique.site/"
+  });
+});
 
 app.use(apiRoutes);
 
