@@ -92,8 +92,25 @@ export const fieldsFiles = async (req: Request, res: Response) => {
   }
 }
 
-//POST
-export const reportsFiles = async (req: Request, res: Response) => {}
+export const reportsFiles = async (req: Request, res: Response) => {
+  try {
+    const { files, template, filename, settings, asynchronous } = req.body;
+    if (!files) return res.status(400).json({ error: "O campo files é obrigatório!"});
+
+    const data = await cargosnapRequest(`/reports`, "POST", {
+      files,
+      template,
+      filename,
+      settings,
+      asynchronous
+    });
+    res.json(data);
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 //GET
 export const shareFiles = async (req: Request, res: Response) => {}
 //GET
