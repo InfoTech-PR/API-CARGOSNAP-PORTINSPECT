@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const API_URL = process.env.CARGOSNAP_URL || "";
-const API_KEY = process.env.CARGOSNAP_API_KEY || "";
+const API_URL = process.env.CARGOSNAP_URL;
+const API_KEY = process.env.CARGOSNAP_API_KEY;
 
 export const cargosnapRequest = async (endpoint: string, method: "GET" | "POST", data?: any) => {
   try {
