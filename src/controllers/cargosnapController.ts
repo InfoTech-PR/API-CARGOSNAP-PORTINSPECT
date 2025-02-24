@@ -131,4 +131,23 @@ export const shareFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const formsFilesById = async (req: Request, res: Response) => {}
+export const formsFilesById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { reference, startdate, enddate, updated_start, updated_end, Limt } = req.body;
+    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório."});
+
+    const data = await cargosnapRequest(`/forms/${id}`, "GET", {
+      reference,
+      startdate,
+      enddate,
+      updated_start,
+      updated_end,
+      Limt
+    });
+    res.json(data);
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
