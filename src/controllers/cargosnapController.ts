@@ -80,8 +80,18 @@ export const uploadsFiles = async (req: Request, res: Response) => {
   }
 }
 
-//POST
-export const fieldsFiles = async (req: Request, res: Response) => {}
+export const fieldsFiles = async (req: Request, res: Response) => {
+  try {
+    const { reference } = req.params;
+    if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
+
+    const data = await cargosnapRequest(`/fields/${reference}`, "POST");
+    res.json(data);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 //POST
 export const reportsFiles = async (req: Request, res: Response) => {}
 //GET
