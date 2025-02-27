@@ -3,18 +3,20 @@ import { cargosnapRequest } from "../services/cargosnapService";
 
 export const getFiles = async (req: Request, res: Response) => {
   try {
-    const { limit, startdate, enddate, include } = req.query;
-    const params: any = {};
-
-    if (limit) params.limit = limit;
-    if (startdate) params.startdate = startdate;
-    if (enddate) params.enddate = enddate;
-    if (include) {
-      const includes = Array.isArray(include) ? include : [include];
-      includes.forEach((item) => params[`include[]`] = item);
-    }
-    const data = await cargosnapRequest("/files", "GET", params);
-    res.json(data);
+    const { reference, find, closed, startdate, enddate, updated_start, updated_end, limit, include, field_id } = req.body;
+    const data = await cargosnapRequest("/files", "GET", {
+      reference,
+      find,
+      closed,
+      startdate,
+      enddate,
+      updated_start,
+      updated_end,
+      limit,
+      include,
+      field_id
+    });
+    res.json(data.data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -34,20 +36,19 @@ export const getFilesById = async (req: Request, res: Response) => {
 
 export const setFiles = async (req: Request, res: Response) => {
   try {
-    const { reference, close, location } = req.body;
-    if (!reference) return res.status(400).json({ error: "O campo refencia é obrigatório!" });
+    const { reference, closed, location } = req.body;
+    if (!reference) return res.status(400).json({ error: "O campo referência é obrigatório!" });
 
     const data = await cargosnapRequest(`/files`, "POST", {
       reference,
-      close: close ?? false,
-      location,
+      closed: closed ? parseInt(closed as string) : 0,
+      location: location ? location as string : '',
     });
     res.json(data);
-
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 export const closeFilesById = async (req: Request, res: Response) => {
   try {
