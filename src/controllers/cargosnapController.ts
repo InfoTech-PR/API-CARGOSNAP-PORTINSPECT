@@ -3,8 +3,7 @@ import { cargosnapRequest } from "../services/cargosnapService";
 
 /*✅*/ export const getFiles = async (req: Request, res: Response) => {
   try {
-    const { reference, find, closed, startdate, enddate, updated_start, updated_end, limit, include, field_id } = req.body;
-    const data = await cargosnapRequest("/files", "GET", {
+    const {
       reference,
       find,
       closed,
@@ -14,13 +13,22 @@ import { cargosnapRequest } from "../services/cargosnapService";
       updated_end,
       limit,
       include,
-      field_id
+      field_id,
+    } = req.body;
+
+    const filteredParams: any = {};
+    Object.entries(req.body).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        filteredParams[key] = value;
+      }
     });
+
+    const data = await cargosnapRequest("/files", "GET", filteredParams);
     res.json(data.data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 /*✅*/ export const getFilesById = async (req: Request, res: Response) => {
   try {
@@ -75,7 +83,7 @@ import { cargosnapRequest } from "../services/cargosnapService";
   }
 }
 
-/*❌*/ export const uploadsFiles = async (req: Request, res: Response) => {
+/*⚠️*/ export const uploadsFiles = async (req: Request, res: Response) => {
   try {
     const { reference, uploads, include_in_share, location } = req.body;
     if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
@@ -86,7 +94,7 @@ import { cargosnapRequest } from "../services/cargosnapService";
       include_in_share,
       location,
     });
-    res.json(data);
+    res.json(data.data);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

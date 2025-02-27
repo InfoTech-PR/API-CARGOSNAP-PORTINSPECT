@@ -6,17 +6,21 @@ dotenv.config();
 const API_URL = process.env.CARGOSNAP_URL;
 const API_TOKEN = process.env.CARGOSNAP_API_KEY;
 
-export const cargosnapRequest = async (
-  endpoint: string,
-  method: "GET" | "POST" | "PATCH" | "DELETE",
-  params?: any
-) => {
+export const cargosnapRequest = async (endpoint: string, method: "GET" | "POST" | "PATCH" | "DELETE", params?: any) => {
   try {
     let url = `${API_URL}${endpoint}?token=${API_TOKEN}`;
 
     if (params) {
-      const queryString = new URLSearchParams(params).toString();
-      url += `&${queryString}`;
+      const filteredParams: any = {};
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== null && params[key] !== undefined) {
+          filteredParams[key] = params[key];
+        }
+      });
+
+      if (Object.keys(filteredParams).length > 0) {
+        url += `&${new URLSearchParams(filteredParams).toString()}`;
+      }
     }
 
     const config: any = {
