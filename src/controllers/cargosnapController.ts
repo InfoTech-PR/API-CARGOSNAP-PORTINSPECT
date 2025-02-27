@@ -63,7 +63,7 @@ import { cargosnapRequest } from "../services/cargosnapService";
   }
 }
 
-/*❌*/ export const deleteFilesById = async (req: Request, res: Response) => {
+/*✅*/ export const deleteFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: "O ID do arquivo é obrigatório." });
