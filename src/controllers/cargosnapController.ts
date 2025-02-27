@@ -11,14 +11,14 @@ export const getFiles = async (req: Request, res: Response) => {
     if (enddate) params.enddate = enddate;
     if (include) {
       const includes = Array.isArray(include) ? include : [include];
-      includes.forEach((item) => params[`include[]`] = item); 
+      includes.forEach((item) => params[`include[]`] = item);
     }
     const data = await cargosnapRequest("/files", "GET", params);
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 export const getFilesById = async (req: Request, res: Response) => {
   try {
