@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { cargosnapRequest } from "../services/cargosnapService";
 
-export const getFiles = async (req: Request, res: Response) => {
+/*✅*/ export const getFiles = async (req: Request, res: Response) => {
   try {
     const { reference, find, closed, startdate, enddate, updated_start, updated_end, limit, include, field_id } = req.body;
     const data = await cargosnapRequest("/files", "GET", {
@@ -22,7 +22,7 @@ export const getFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const getFilesById = async (req: Request, res: Response) => {
+/*✅*/ export const getFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
@@ -34,23 +34,24 @@ export const getFilesById = async (req: Request, res: Response) => {
   }
 }
 
-export const setFiles = async (req: Request, res: Response) => {
+/*⚠️*/ export const setFiles = async (req: Request, res: Response) => {
   try {
     const { reference, closed, location } = req.body;
     if (!reference) return res.status(400).json({ error: "O campo referência é obrigatório!" });
 
-    const data = await cargosnapRequest(`/files`, "POST", {
+    const data = await cargosnapRequest("/files", "POST", {
       reference,
-      closed: closed ? parseInt(closed as string) : 0,
-      location: location ? location as string : '',
+      closed: closed !== undefined ? Number(closed) : 0,
+      location: location !== undefined ? Number(location) : 0,
     });
-    res.json(data);
+
+    res.json(data.data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 };
 
-export const closeFilesById = async (req: Request, res: Response) => {
+/*✅*/ export const closeFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
@@ -62,7 +63,7 @@ export const closeFilesById = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteFilesById = async (req: Request, res: Response) => {
+/*❌*/ export const deleteFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ message: "O ID do arquivo é obrigatório." });
@@ -74,7 +75,7 @@ export const deleteFilesById = async (req: Request, res: Response) => {
   }
 }
 
-export const uploadsFiles = async (req: Request, res: Response) => {
+/*❌*/ export const uploadsFiles = async (req: Request, res: Response) => {
   try {
     const { reference, uploads, include_in_share, location } = req.body;
     if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
@@ -91,7 +92,7 @@ export const uploadsFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const fieldsFiles = async (req: Request, res: Response) => {
+/*❌*/ export const fieldsFiles = async (req: Request, res: Response) => {
   try {
     const { reference } = req.params;
     if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
@@ -103,7 +104,7 @@ export const fieldsFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const reportsFiles = async (req: Request, res: Response) => {
+/*❌*/ export const reportsFiles = async (req: Request, res: Response) => {
   try {
     const { files, template, filename, settings, asynchronous } = req.body;
     if (!files) return res.status(400).json({ error: "O campo files é obrigatório!" });
@@ -122,7 +123,7 @@ export const reportsFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const shareFiles = async (req: Request, res: Response) => {
+/*❌*/ export const shareFiles = async (req: Request, res: Response) => {
   try {
     const { reference, expires, language, dl, email, send_email } = req.body;
     if (!reference) return res.status(400).json({ error: "O campo reference é obrigatório!" });
@@ -142,7 +143,7 @@ export const shareFiles = async (req: Request, res: Response) => {
   }
 }
 
-export const formsFilesById = async (req: Request, res: Response) => {
+/*❌*/ export const formsFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { reference, startdate, enddate, updated_start, updated_end, Limt } = req.body;
