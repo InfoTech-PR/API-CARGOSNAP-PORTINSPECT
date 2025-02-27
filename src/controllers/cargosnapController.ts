@@ -3,7 +3,17 @@ import { cargosnapRequest } from "../services/cargosnapService";
 
 export const getFiles = async (req: Request, res: Response) => {
   try {
-    const data = await cargosnapRequest("/files", "GET");
+    const { limit, startdate, enddate, include } = req.query;
+    const params: any = {};
+
+    if (limit) params.limit = limit;
+    if (startdate) params.startdate = startdate;
+    if (enddate) params.enddate = enddate;
+    if (include) {
+      const includes = Array.isArray(include) ? include : [include];
+      includes.forEach((item) => params[`include[]`] = item); 
+    }
+    const data = await cargosnapRequest("/files", "GET", params);
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -13,8 +23,8 @@ export const getFiles = async (req: Request, res: Response) => {
 export const getFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório."});
-    
+    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
+
     const data = await cargosnapRequest(`/files/${id}`, "GET");
     res.json(data);
   } catch (error: any) {
@@ -25,7 +35,7 @@ export const getFilesById = async (req: Request, res: Response) => {
 export const setFiles = async (req: Request, res: Response) => {
   try {
     const { reference, close, location } = req.body;
-    if (!reference) return res.status(400).json({ error: "O campo refencia é obrigatório!"});
+    if (!reference) return res.status(400).json({ error: "O campo refencia é obrigatório!" });
 
     const data = await cargosnapRequest(`/files`, "POST", {
       reference,
@@ -72,7 +82,7 @@ export const uploadsFiles = async (req: Request, res: Response) => {
       reference,
       uploads,
       include_in_share,
-      location,      
+      location,
     });
     res.json(data);
   } catch (error: any) {
@@ -95,7 +105,7 @@ export const fieldsFiles = async (req: Request, res: Response) => {
 export const reportsFiles = async (req: Request, res: Response) => {
   try {
     const { files, template, filename, settings, asynchronous } = req.body;
-    if (!files) return res.status(400).json({ error: "O campo files é obrigatório!"});
+    if (!files) return res.status(400).json({ error: "O campo files é obrigatório!" });
 
     const data = await cargosnapRequest(`/reports`, "POST", {
       files,
@@ -114,11 +124,11 @@ export const reportsFiles = async (req: Request, res: Response) => {
 export const shareFiles = async (req: Request, res: Response) => {
   try {
     const { reference, expires, language, dl, email, send_email } = req.body;
-    if (!reference) return res.status(400).json({ error: "O campo reference é obrigatório!"});
+    if (!reference) return res.status(400).json({ error: "O campo reference é obrigatório!" });
 
     const data = await cargosnapRequest(`/share`, "GET", {
       reference,
-      expires ,
+      expires,
       language,
       dl,
       email,
@@ -135,7 +145,7 @@ export const formsFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { reference, startdate, enddate, updated_start, updated_end, Limt } = req.body;
-    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório."});
+    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
 
     const data = await cargosnapRequest(`/forms/${id}`, "GET", {
       reference,
