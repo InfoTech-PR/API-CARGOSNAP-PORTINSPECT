@@ -164,41 +164,60 @@ const API_TOKEN = process.env.CARGOSNAP_API_KEY;
   }
 };
 
-/*⚠️*/ export const fieldsFiles = async (req: Request, res: Response) => {
+/*✅*/ export const fieldsFiles = async (req: Request, res: Response) => {
   try {
-    const { reference } = req.body;
-    if (!reference) return res.status(400).json({ message: "O campo referência é obrigatório." });
+    const { reference, fields } = req.body;
 
-    const params = new URLSearchParams({
-      token: API_TOKEN!,
-      reference,
-    });
+    if (!reference) {
+      return res.status(400).json({ message: "O campo referência é obrigatório." });
+    }
 
-    const response = await axios.get(`${CARGOSNAP_API_URL}/fields?${params.toString()}`); // 🔄 Corrigindo endpoint
+    if (!Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({ message: "Os campos são obrigatórios e devem estar em um array." });
+    }
+
+    const response = await axios.post(
+      `${CARGOSNAP_API_URL}/fields/${reference}?token=${API_TOKEN}`,
+      fields,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
     res.json(response.data);
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    return res.status(error.response?.status || 500).json({ error: error.response?.data || error.message });
   }
 };
 
-/*⚠️*/ export const reportsFiles = async (req: Request, res: Response) => {
+/*✅*/ export const reportsFiles = async (req: Request, res: Response) => {
   try {
     const { files, template, filename, settings, asynchronous } = req.body;
-    if (!files) return res.status(400).json({ error: "O campo files é obrigatório!" });
 
-    const params = new URLSearchParams({
-      token: API_TOKEN!,
+    if (!files || !Array.isArray(files) || files.length === 0) {
+      return res.status(400).json({ error: "O campo 'files' é obrigatório e deve ser um array!" });
+    }
+
+    const requestData = {
       files,
-      template,
-      filename,
-      settings,
-      asynchronous,
-    });
+      ...(template && { template }),
+      ...(filename && { filename }),
+      ...(asynchronous !== undefined && { asynchronous }),
+      ...(settings && { settings }),
+    };
 
-    const response = await axios.post(`${CARGOSNAP_API_URL}/reports?${params.toString()}`); // 🔄 Correção
-    res.json(response.data);
+    const response = await axios.post(
+      `${CARGOSNAP_API_URL}/reports?token=${API_TOKEN}`,
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    res.status(201).json(response.data);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error("Erro ao gerar relatório:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || "Erro interno no servidor" });
   }
 };
 
