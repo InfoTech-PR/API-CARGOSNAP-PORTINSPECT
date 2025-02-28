@@ -235,7 +235,7 @@ const API_TOKEN = process.env.CARGOSNAP_API_KEY;
       ...(language && { language }),
       ...(dl !== undefined ? { dl: String(dl) } : {}),
       ...(email && { email }),
-      ...(send_email !== undefined ? { send_email: String(send_email) } : {}), 
+      ...(send_email !== undefined ? { send_email: String(send_email) } : {}),
     });
 
     const response = await axios.get(`${CARGOSNAP_API_URL}/share?${params.toString()}`);
@@ -246,19 +246,34 @@ const API_TOKEN = process.env.CARGOSNAP_API_KEY;
   }
 };
 
-/*⚠️*/ export const formsFilesById = async (req: Request, res: Response) => {
+/*✅*/ export const formsFilesById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: "O ID do arquivo é obrigatório." });
 
-    const params = new URLSearchParams({
-      token: API_TOKEN!,
-      ...req.body, // Mantendo os outros filtros
-    });
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: "O ID do formulário é obrigatório e deve ser um número válido." });
+    }
 
-    const response = await axios.get(`${CARGOSNAP_API_URL}/forms/${id}?${params.toString()}`); // 🔄 Correção
-    res.json(response.data);
+    if (!API_TOKEN) {
+      return res.status(500).json({ error: "API_TOKEN não está configurado." });
+    }
+
+    const { reference, startdate, enddate, updated_start, updated_end, limit } = req.query;
+
+    const params = new URLSearchParams({ token: API_TOKEN });
+
+    if (reference) params.append("reference", String(reference));
+    if (startdate) params.append("startdate", String(startdate));
+    if (enddate) params.append("enddate", String(enddate));
+    if (updated_start) params.append("updated_start", String(updated_start));
+    if (updated_end) params.append("updated_end", String(updated_end));
+    if (limit) params.append("limit", String(limit));
+
+    const response = await axios.get(`${CARGOSNAP_API_URL}/forms/${id}?${params.toString()}`);
+
+    return res.json(response.data.data);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error("Erro ao buscar formulário:", error.message);
+    return res.status(500).json({ error: "Erro interno do servidor ao buscar o formulário." });
   }
 };
