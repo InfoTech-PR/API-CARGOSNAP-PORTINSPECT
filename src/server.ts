@@ -14,19 +14,35 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.get("/status", (req: Request, res: Response) => {
   const uptimeInSeconds = process.uptime();
   const hours = Math.floor(uptimeInSeconds / 3600);
-  const minutes = Math.floor((uptimeInSeconds % 3600) / 60);
+  const minutes =
+    Math.floor((uptimeInSeconds % 3600) / 60);
   const seconds = Math.floor(uptimeInSeconds % 60);
+  const routes: string[] = [];
+
+  app._router.stack.forEach((middleware: any) => {
+    if (middleware.route) {
+      routes.push(`${Object.keys(middleware.route.methods).join(", ").toUpperCase()} ${middleware.route.path}`);
+    } else if (middleware.name === "router") {
+      middleware.handle.stack.forEach((handler: any) => {
+        if (handler.route) {
+          routes.push(`${Object.keys(handler.route.methods).join(", ").toUpperCase()} ${handler.route.path}`);
+        }
+      });
+    }
+  });
 
   res.json({
     status: "API rodando",
     uptime: `${hours}h ${minutes}m ${seconds}s`,
     timestamp: new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }),
     developed: "Josue Henrique",
-    portfolio: "https://josuashenrique.site/"
+    portfolio: "https://josuashenrique.site/",
+    rotas: routes
   });
 });
 
 app.use(apiRoutes);
+app.use("/docs", express.static(path.join(__dirname, "../apidoc")));
 
 app.use((req: Request, res: Response) => {
   res.status(404);
