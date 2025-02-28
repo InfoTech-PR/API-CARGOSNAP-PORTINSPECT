@@ -221,25 +221,28 @@ const API_TOKEN = process.env.CARGOSNAP_API_KEY;
   }
 };
 
-/*⚠️*/ export const shareFiles = async (req: Request, res: Response) => {
+/*✅*/ export const shareFiles = async (req: Request, res: Response) => {
   try {
     const { reference, expires, language, dl, email, send_email } = req.body;
-    if (!reference) return res.status(400).json({ error: "O campo reference é obrigatório!" });
+    if (!reference) {
+      return res.status(400).json({ error: "O campo reference é obrigatório!" });
+    }
 
     const params = new URLSearchParams({
       token: API_TOKEN!,
       reference,
-      expires,
-      language,
-      dl,
-      email,
-      send_email,
+      ...(expires && { expires: new Date(expires).toISOString() }),
+      ...(language && { language }),
+      ...(dl !== undefined ? { dl: String(dl) } : {}),
+      ...(email && { email }),
+      ...(send_email !== undefined ? { send_email: String(send_email) } : {}), 
     });
 
-    const response = await axios.post(`${CARGOSNAP_API_URL}/shares?${params.toString()}`); // 🔄 Correção
+    const response = await axios.get(`${CARGOSNAP_API_URL}/share?${params.toString()}`);
+
     res.json(response.data);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message });
   }
 };
 
