@@ -2,11 +2,12 @@ module.exports = {
     apps: [
         {
             name: "API-CARGOSNAP-PORTINSPECT",
-            script: "./src/server.ts",
+            script: "./dist/server.js",
             instances: 1,
-            interpreter: "ts-node", 
+            interpreter: "node",
             env: {
                 NODE_ENV: "development",
+                PORT: 3003
             },
             watch: true,
             ignore_watch: ["node_modules", "logs"],
